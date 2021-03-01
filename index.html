@@ -15,12 +15,12 @@
       <!-- Header -->
       <header>
         <h4>Now playing:</h4>
-        <h2>String 57th & 9th</h2>
+        <h2> </h2>
       </header>
   
       <!-- CD -->
       <div class="cd">
-        <div class="cd-thumb" style="background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg')">
+        <div class="cd-thumb" style="background-image: url('')">
         </div>
       </div>
   
@@ -69,77 +69,131 @@
     */
     const $ = document.querySelector.bind(document);
     const $$ = document.querySelectorAll.bind(document);
-  
+
+    const player = $('.player');
+    const heading = $('header h2');
+    const cdThumb = $('.cd-thumb');
+    const audio = $('#audio');
+    const cd = $('.cd');
+    const playBtn = $('.btn-toggle-play');
+
     const app = {
-        songs : [
-          {
-            name: 'AAAA',
-            singer: 'BBBB',
-            path:'./assets/music/song1.mp3',
-            img: './assets/img/song1.jpg'
-          },
-          {
-            name: 'BBBB',
-            singer: 'CCCC',
-            path:'./assets/music/song2.mp3',
-            img: './assets/img/song1.jpg'
-          },
-          {
-            name: 'AAAA',
-            singer: 'BBBB',
-            path:'./assets/music/song1.mp3',
-            img: './assets/img/song1.jpg'
-          },
-          {
-            name: 'BBBB',
-            singer: 'CCCC',
-            path:'./assets/music/song2.mp3',
-            img: './assets/img/song1.jpg'
-          },
-          {
-            name: 'AAAA',
-            singer: 'BBBB',
-            path:'./assets/music/song1.mp3',
-            img: './assets/img/song1.jpg'
-          },
-          {
-            name: 'BBBB',
-            singer: 'CCCC',
-            path:'./assets/music/song2.mp3',
-            img: './assets/img/song1.jpg'
-          },
-        ],
-        render: function(){
-          const htmls = this.songs.map( (song) => {
-            return `
-            <div class="song">
-              <div class="thumb" style="background-image: url('${song.img}')">
-              </div>
-              <div class="body">
-                <h3 class="title">${song.name}</h3>
-                <p class="author">${song.singer}</p>
-              </div>
-              <div class="option">
-                <i class="fas fa-ellipsis-h"></i>
-              </div>
+      currentIndex: 0,
+      isPlaying : false,
+      songs : [
+        {
+          name: 'AAAA',
+          singer: 'BBBB',
+          path:'./assets/music/song1.mp3',
+          img: './assets/img/song1.jpg'
+        },
+        {
+          name: 'BBBB',
+          singer: 'CCCC',
+          path:'./assets/music/song2.mp3',
+          img: './assets/img/song1.jpg'
+        },
+        {
+          name: 'AAAA',
+          singer: 'BBBB',
+          path:'./assets/music/song1.mp3',
+          img: './assets/img/song1.jpg'
+        },
+        {
+          name: 'BBBB',
+          singer: 'CCCC',
+          path:'./assets/music/song2.mp3',
+          img: './assets/img/song1.jpg'
+        },
+        {
+          name: 'AAAA',
+          singer: 'BBBB',
+          path:'./assets/music/song1.mp3',
+          img: './assets/img/song1.jpg'
+        },
+        {
+          name: 'BBBB',
+          singer: 'CCCC',
+          path:'./assets/music/song2.mp3',
+          img: './assets/img/song1.jpg'
+        },
+      ],
+      render: function(){
+        const htmls = this.songs.map( (song) => {
+          return `
+          <div class="song">
+            <div class="thumb" style="background-image: url('${song.img}')">
             </div>
-            `
-          })
-          $('.playlist').innerHTML = htmls.join('');
-        },
-        handleEvent: function(){
-          const cd = $('.cd');
-          const cdWidth = cd.offsetWidth;
-          document.onscroll = function(){
-            const scrollTop = window.scrollY || document.documentElement.scrollTop;
-            const newCdWidth = cdWidth - scrollTop;
-            cd.style.width = newCdWidth > 0 ? newCdWidth + 'px' : 0 ;
+            <div class="body">
+              <h3 class="title">${song.name}</h3>
+              <p class="author">${song.singer}</p>
+            </div>
+            <div class="option">
+              <i class="fas fa-ellipsis-h"></i>
+            </div>
+          </div>
+          `
+        })
+        $('.playlist').innerHTML = htmls.join('');
+      },
+      
+      defineProperties: function(){
+        Object.defineProperty(this, 'currentSong', {
+          get: function(){
+            return this.songs[this.currentIndex]
           }
-        },
-        start: function(){
-          this.handleEvent();
-          this.render();
+        });
+      },
+
+      handleEvent: function(){
+        _this = this;
+        const cdWidth = cd.offsetWidth;
+        // xử lý giao diện phóng to / thu nhỏ thẻ CD
+        document.onscroll = function(){
+          const scrollTop = window.scrollY || document.documentElement.scrollTop;
+          const newCdWidth = cdWidth - scrollTop;
+
+          cd.style.width = newCdWidth > 0 ? newCdWidth + 'px' : 0 ;
+          cd.style.opacity = newCdWidth / cdWidth;
         }
+        // xử lý khi click play
+        // isPlaying đang là false => hiển thị nút play. Khi click vào play thì nhạc sẽ phát và
+        // isPlaying= true nên hiển thị nút pause. khi click vào pause thì sẽ remove playing và hiển thị nút play
+        playBtn.onclick = function(){
+          if(_this.isPlaying){     
+            audio.pause();
+          } else {   
+            audio.play();     
+          }  
+        }
+        // khi song được play
+        audio.onplay = function(){
+          _this.isPlaying = true;
+          player.classList.add('playing')
+        }
+        // khi song bị pause
+        audio.onpause = function(){
+          _this.isPlaying = false;
+          player.classList.remove('playing')
+        }
+      },
+      
+      loadCurrentSong: function(){
+        heading.textContent = this.currentSong.name;
+        cdThumb.style.backgroundImage = ` url('${this.currentSong.img}') `;
+        audio.src = this.currentSong.path;
+      },
+
+      start: function(){
+        // định nghĩa các thuộc tính cho object
+        this.defineProperties();
+        // lắng nghe và xử lý các sự kiện ( DOM events)
+        this.handleEvent();
+        // tải thông tin bài hát đầu tiên vào UI khi chạy ứng dụng
+        this.loadCurrentSong();
+        // render playlist
+        this.render();
+      }
     };
 
     app.start();
