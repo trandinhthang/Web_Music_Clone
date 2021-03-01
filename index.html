@@ -6,7 +6,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="./assets/css/main.css">
+  <link rel='shortcut icon' type='image/x-icon' href='./assets/img/logo.jpg' />  
 </head>
 <body>
   <div class="player">
@@ -77,46 +78,42 @@
     const cd = $('.cd');
     const playBtn = $('.btn-toggle-play');
     const progress = $('#progress');
+    const nextBtn = $('.btn-next');
+    const prevBtn = $('.btn-prev');
 
     const app = {
       currentIndex: 0,
       isPlaying : false,
       songs : [
         {
-          name: 'AAAA',
-          singer: 'BBBB',
+          name: 'Anh luôn là lý do',
+          singer: 'Erik',
           path:'./assets/music/song1.mp3',
           img: './assets/img/song1.jpg'
         },
         {
-          name: 'BBBB',
-          singer: 'CCCC',
+          name: 'Phải chăng em đã yêu',
+          singer: 'Juky San',
           path:'./assets/music/song2.mp3',
-          img: './assets/img/song1.jpg'
+          img: './assets/img/song2.jpg'
         },
         {
-          name: 'AAAA',
-          singer: 'BBBB',
-          path:'./assets/music/song1.mp3',
-          img: './assets/img/song1.jpg'
+          name: 'Tình bạn diệu kỳ',
+          singer: 'Ricky Star',
+          path:'./assets/music/song3.mp3',
+          img: './assets/img/song3.jpg'
         },
         {
-          name: 'BBBB',
-          singer: 'CCCC',
-          path:'./assets/music/song2.mp3',
-          img: './assets/img/song1.jpg'
+          name: 'Trên tình bạn dưới tình yêu',
+          singer: 'MIN',
+          path:'./assets/music/song4.mp3',
+          img: './assets/img/song4.jpg'
         },
         {
-          name: 'AAAA',
-          singer: 'BBBB',
-          path:'./assets/music/song1.mp3',
-          img: './assets/img/song1.jpg'
-        },
-        {
-          name: 'BBBB',
-          singer: 'CCCC',
-          path:'./assets/music/song2.mp3',
-          img: './assets/img/song1.jpg'
+          name: 'Nàng thơ',
+          singer: 'Hoàng Dũng',
+          path:'./assets/music/song5.mp3',
+          img: './assets/img/song5.jpg'
         },
       ],
       render: function(){
@@ -198,11 +195,23 @@
             progress.value = progressPercent;
           }  
         }
-        
+
         // xử lý khi tua bài hát
         progress.onchange = function(){
           const seekTime = progress.value * audio.duration / 100;
           audio.currentTime = seekTime;
+        }
+
+        // xử lý sự kiện next bài hát
+        nextBtn.onclick = function(){
+          _this.nextSong();
+          audio.play();
+        }
+
+        // xử lý sự kiện prev bài hát
+        prevBtn.onclick = function(){
+          _this.prevSong();
+          audio.play();
         }
       },
       
@@ -210,6 +219,22 @@
         heading.textContent = this.currentSong.name;
         cdThumb.style.backgroundImage = ` url('${this.currentSong.img}') `;
         audio.src = this.currentSong.path;
+      },
+
+      nextSong: function(){
+        this.currentIndex++;
+        if(this.currentIndex >= this.songs.length){
+          this.currentIndex = 0; // khi click next hết bài thì quay lai bài đầu tiên 
+        }
+        this.loadCurrentSong();
+      },
+
+      prevSong: function(){
+        this.currentIndex--;
+        if(this.currentIndex < 0){
+          this.currentIndex = this.songs.length - 1; // khi click prev hết bài đầu => tới bài cuối
+        }
+        this.loadCurrentSong();
       },
 
       start: function(){
