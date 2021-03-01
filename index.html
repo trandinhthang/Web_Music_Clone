@@ -149,6 +149,14 @@
       handleEvent: function(){
         _this = this;
         const cdWidth = cd.offsetWidth;
+
+        // xử lý CD quay và dừng
+        const cdThumbAnimated = cdThumb.animate(
+          { transform: 'rotate(360deg)' },
+          { duration: 10000, iterations: Infinity } // 10s
+        );
+        cdThumbAnimated.pause();
+
         // xử lý giao diện phóng to / thu nhỏ thẻ CD
         document.onscroll = function(){
           const scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -157,6 +165,7 @@
           cd.style.width = newCdWidth > 0 ? newCdWidth + 'px' : 0 ;
           cd.style.opacity = newCdWidth / cdWidth;
         }
+
         // xử lý khi click play
         // isPlaying đang là false => hiển thị nút play. Khi click vào play thì nhạc sẽ phát và
         // isPlaying= true nên hiển thị nút pause. khi click vào pause thì sẽ remove playing và hiển thị nút play
@@ -167,16 +176,21 @@
             audio.play();     
           }  
         }
+
         // khi song được play
         audio.onplay = function(){
           _this.isPlaying = true;
-          player.classList.add('playing')
+          player.classList.add('playing');
+          cdThumbAnimated.play();
         }
+
         // khi song bị pause
         audio.onpause = function(){
           _this.isPlaying = false;
-          player.classList.remove('playing')
+          player.classList.remove('playing');
+          cdThumbAnimated.pause();
         }
+
         // khi tiến độ bài hát thay đổi
         audio.ontimeupdate = function(){
           if(audio.duration){
@@ -184,6 +198,7 @@
             progress.value = progressPercent;
           }  
         }
+        
         // xử lý khi tua bài hát
         progress.onchange = function(){
           const seekTime = progress.value * audio.duration / 100;
