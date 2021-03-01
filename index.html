@@ -108,7 +108,7 @@
             path:'./assets/music/song2.mp3',
             img: './assets/img/song1.jpg'
           },
-      ],
+        ],
         render: function(){
           const htmls = this.songs.map( (song) => {
             return `
@@ -127,12 +127,23 @@
           })
           $('.playlist').innerHTML = htmls.join('');
         },
+        handleEvent: function(){
+          const cd = $('.cd');
+          const cdWidth = cd.offsetWidth;
+          document.onscroll = function(){
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const newCdWidth = cdWidth - scrollTop;
+            cd.style.width = newCdWidth > 0 ? newCdWidth + 'px' : 0 ;
+          }
+        },
         start: function(){
+          this.handleEvent();
           this.render();
         }
     };
 
     app.start();
+
   </script>
 </body>
 </html>
