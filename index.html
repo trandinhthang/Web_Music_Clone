@@ -64,7 +64,7 @@
       5. next / previous
       6. random
       7. next / repeat when ended
-      8. active song
+      8. active song (show color that item)
       9. scroll active into view
       10. play song when click
     */
@@ -81,11 +81,13 @@
     const nextBtn = $('.btn-next');
     const prevBtn = $('.btn-prev');
     const randomBtn = $('.btn-random');
+    const repeatBtn = $('.btn-repeat');
 
     const app = {
       currentIndex: 0,
       isPlaying : false,
       isRandom : false,
+      isRepeat : false,
       songs : [
         {
           name: 'Anh luôn là lý do',
@@ -119,9 +121,9 @@
         },
       ],
       render: function(){
-        const htmls = this.songs.map( (song) => {
+        const htmls = this.songs.map( (song,index) => {
           return `
-          <div class="song">
+          <div class="song ${index === this.currentIndex ? 'active' : ''} ">
             <div class="thumb" style="background-image: url('${song.img}')">
             </div>
             <div class="body">
@@ -212,6 +214,8 @@
             _this.nextSong();
           }
           audio.play();
+          _this.render();
+          _this.scrollToActiveSong();
         }
 
         // xử lý sự kiện prev bài hát
@@ -222,6 +226,8 @@
             _this.prevSong();
           }
           audio.play();
+          _this.render();
+          _this.scrollToActiveSong();
         }
 
         // xử lý sự kiện bật/tắt random bài hát
@@ -232,8 +238,19 @@
 
         // xử lý sự kiện khi bài hát kết thúc
         audio.onended = function(){
-          nextBtn.click(); // tự động click vào button next
+          if(_this.isRepeat){ // khi click vào button repeat
+            audio.play();
+          } else {
+            nextBtn.click(); // tự động click vào button next
+          }   
         }
+
+        // xử lý sự kiện lặp lại bài vừa hát khi kết thúc
+        repeatBtn.onclick = function(){
+          _this.isRepeat = !_this.isRepeat;
+          repeatBtn.classList.toggle('active', _this.isRepeat);
+        }
+
       },
       
       loadCurrentSong: function(){
@@ -265,6 +282,15 @@
         } while ( newIndex === this.currentIndex )
         this.currentIndex = newIndex ;
         this.loadCurrentSong();
+      },
+
+      scrollToActiveSong: function(){
+        setTimeout(function(){
+          $('.song.active').scrollIntoView({
+            behavior: 'smooth',
+            block: 'end',
+          });
+        }, 200)
       },
 
       start: function(){
