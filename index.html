@@ -80,10 +80,12 @@
     const progress = $('#progress');
     const nextBtn = $('.btn-next');
     const prevBtn = $('.btn-prev');
+    const randomBtn = $('.btn-random');
 
     const app = {
       currentIndex: 0,
       isPlaying : false,
+      isRandom : false,
       songs : [
         {
           name: 'Anh luôn là lý do',
@@ -204,14 +206,33 @@
 
         // xử lý sự kiện next bài hát
         nextBtn.onclick = function(){
-          _this.nextSong();
+          if( _this.isRandom ){   // khi random được bật( isTrue )
+            _this.playRandomSong(); 
+          } else {
+            _this.nextSong();
+          }
           audio.play();
         }
 
         // xử lý sự kiện prev bài hát
         prevBtn.onclick = function(){
-          _this.prevSong();
+          if( _this.isRandom){
+            _this.playRandomSong();
+          } else {
+            _this.prevSong();
+          }
           audio.play();
+        }
+
+        // xử lý sự kiện bật/tắt random bài hát
+        randomBtn.onclick = function(){
+          _this.isRandom = !_this.isRandom;
+          randomBtn.classList.toggle('active', _this.isRandom); 
+        } 
+
+        // xử lý sự kiện khi bài hát kết thúc
+        audio.onended = function(){
+          nextBtn.click(); // tự động click vào button next
         }
       },
       
@@ -234,6 +255,15 @@
         if(this.currentIndex < 0){
           this.currentIndex = this.songs.length - 1; // khi click prev hết bài đầu => tới bài cuối
         }
+        this.loadCurrentSong();
+      },
+
+      playRandomSong: function(){
+        let newIndex;
+        do {
+            newIndex = Math.floor(Math.random() * this.songs.length);
+        } while ( newIndex === this.currentIndex )
+        this.currentIndex = newIndex ;
         this.loadCurrentSong();
       },
 
